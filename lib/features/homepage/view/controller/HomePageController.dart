@@ -35,22 +35,33 @@ class HomeController extends GetxController {
     }
   }
 
-  /// _getImageList fetches the images from Pixabay API
-  Future<void> _getImageList() async {
-    // incrementing the page number
-    _page++;
-    // if we are on 1st page then the page loader will be shown
-    if (_page == 1) {
-      isLoading.value = true;
-    } else {
-      // else we are loading more data when user reaches the end of scroll
-      isPaginationLoading.value = true;
-    }
+  Future<void> searchImagesByKeyword(String value) async {
+    imagesResponseModel.clear();
+    update();
+    await _getImageList(query: value);
+  }
 
+  /// _getImageList fetches the images from Pixabay API
+  Future<void> _getImageList({String? query}) async {
     try {
+      // incrementing the page number
+      _page++;
+      // if we are on 1st page then the page loader will be shown
+
+      Map<String, dynamic> qParams = {"page": _page, "per_page": _limit};
+      if (query != null) {
+        qParams["q"] = query;
+        _page = 1;
+        qParams["page"] = _page;
+      }
+      if (_page == 1) {
+        isLoading.value = true;
+      } else {
+        // else we are loading more data when user reaches the end of scroll
+        isPaginationLoading.value = true;
+      }
       // fetching the data
-      final result = await _usecase
-          .getImagesFromPixabay({"page": _page, "per_page": _limit});
+      final result = await _usecase.getImagesFromPixabay(qParams);
       // initializing the image response model with the first set
       if (_page == 1) {
         imagesResponseModel.value = result?.hits ?? [];
