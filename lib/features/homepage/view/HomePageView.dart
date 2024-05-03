@@ -34,36 +34,47 @@ class HomePageView extends GetView<HomeController> {
                 ),
               ),
             ),
-            Center(
-              child: Scrollbar(
-                trackVisibility: true,
-                interactive: true,
-                controller: controller.scrollController,
-                child: SingleChildScrollView(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  controller: controller.scrollController,
-                  child: GetBuilder<HomeController>(
-                    init: controller,
-                    builder: (controller) => Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 20,
-                      runSpacing: 20,
-                      children: List.generate(
-                          controller.imagesResponseModel.length,
-                          (index) => ImageTile(
-                                imageData:
-                                    controller.imagesResponseModel[index],
-                              )),
-                    ),
-                  ),
+            GetBuilder<HomeController>(
+                init: controller,
+                builder: (controller) => GridView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      controller: controller.scrollController,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: _calculateCrossAxisCount(context),
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                      ),
+                      itemCount: controller.imagesResponseModel.value
+                          .length, // Change this according to your image count
+                      itemBuilder: (context, index) {
+                        return ImageTile(
+                          imageData: controller.imagesResponseModel[index],
+                        );
+                      },
+                    )
+                // Wrap(
+                //   alignment: WrapAlignment.center,
+                //   spacing: 20,
+                //   runSpacing: 20,
+
+                //   children: List.generate(
+                //       controller.imagesResponseModel.length,
+                //       (index) => ImageTile(
+                //             imageData:
+                //                 controller.imagesResponseModel[index],
+                //           )),
+                // ),
                 ),
-              ),
-            ),
           ],
         ),
       ),
     );
+  }
+
+  int _calculateCrossAxisCount(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount =
+        screenWidth ~/ 250; // Adjust 200 according to image size
+    return crossAxisCount;
   }
 }
